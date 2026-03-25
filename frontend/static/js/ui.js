@@ -90,6 +90,13 @@ function openLightbox(photos, startIndex = 0) {
   renderLightboxImage();
   renderDots();
   document.body.style.overflow = 'hidden';
+
+  // Reset slideshow UI state when opening lightbox manually
+  stopSlideshow();
+  const btn = document.getElementById('slideshow-btn');
+  const indicator = document.getElementById('slideshow-indicator');
+  if (btn) btn.classList.remove('active');
+  if (indicator) indicator.classList.remove('show');
 }
 
 function closeLightbox() {
