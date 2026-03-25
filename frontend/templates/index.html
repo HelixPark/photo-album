@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网络相册</title>
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div id="loading-overlay" class="loading-overlay">
+  <div class="spinner spinner-dark" style="width:40px;height:40px;border-width:3px;"></div>
+</div>
+
+<!-- ===== AUTH PAGE ===== -->
+<div id="auth-page" class="auth-page" style="display:none;">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <span class="logo-icon">📷</span>
+      <h1>网络相册</h1>
+      <p>记录生活中的每一个美好瞬间</p>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" onclick="switchTab('login')">登录</div>
+      <div class="auth-tab" onclick="switchTab('register')">注册</div>
+    </div>
+
+    <!-- Login Form -->
+    <div id="login-form" class="auth-form active">
+      <div id="login-alert" class="alert alert-error"></div>
+      <div class="form-group">
+        <label class="form-label">用户名</label>
+        <input type="text" id="login-username" class="form-input" placeholder="请输入用户名" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input type="password" id="login-password" class="form-input" placeholder="请输入密码" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;" onclick="handleLogin()" id="login-btn">
+        登录
+      </button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" class="auth-form">
+      <div id="register-alert" class="alert alert-error"></div>
+      <div class="form-group">
+        <label class="form-label">用户名</label>
+        <input type="text" id="reg-username" class="form-input" placeholder="2-50 个字符" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">邮箱</label>
+        <input type="email" id="reg-email" class="form-input" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">密码</label>
+        <input type="password" id="reg-password" class="form-input" placeholder="至少 6 个字符" autocomplete="new-password">
+      </div>
+      <button class="btn btn-primary btn-lg" style="width:100%;" onclick="handleRegister()" id="register-btn">
+        注册
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div id="app" style="display:none;">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a class="navbar-brand" href="#" onclick="showAlbumList()">
+        <span>📷</span> 网络相册
+      </a>
+      <div class="navbar-actions">
+        <div class="user-info">
+          <div class="avatar" id="user-avatar">U</div>
+          <span id="user-name">用户</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="Auth.logout()">退出</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== ALBUM LIST VIEW ===== -->
+  <div id="view-albums" class="main-content">
+    <div class="container">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">我的相册</h1>
+          <p class="page-subtitle" id="album-count-text">加载中...</p>
+        </div>
+        <button class="btn btn-primary" onclick="openModal('create-album-modal')">
+          ＋ 新建相册
+        </button>
+      </div>
+
+      <div id="albums-grid" class="albums-grid">
+        <!-- Albums rendered here -->
+      </div>
+
+      <div id="albums-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">🖼️</div>
+        <h3>还没有相册</h3>
+        <p>创建你的第一个相册，开始记录美好时光</p>
+        <button class="btn btn-primary" onclick="openModal('create-album-modal')">创建相册</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== ALBUM DETAIL VIEW ===== -->
+  <div id="view-album-detail" class="main-content" style="display:none;">
+    <div class="container">
+      <div class="back-btn" onclick="showAlbumList()">
+        ← 返回相册列表
+      </div>
+
+      <div class="album-detail-header">
+        <div>
+          <h1 class="page-title" id="detail-title">相册名称</h1>
+          <p class="page-subtitle" id="detail-meta">0 张照片</p>
+          <p id="detail-description" style="color:var(--text-muted);font-size:.9rem;margin-top:4px;"></p>
+        </div>
+        <div class="album-detail-actions">
+          <button class="btn btn-outline btn-sm" onclick="openUploadModal()">
+            ↑ 上传照片
+          </button>
+          <button class="btn btn-outline btn-sm" id="share-btn" onclick="handleToggleShare()">
+            🔗 分享
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="openEditAlbumModal()">
+            ✏️ 编辑
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="handleDeleteAlbum()">
+            🗑️ 删除相册
+          </button>
+        </div>
+      </div>
+
+      <!-- Share link banner -->
+      <div id="share-banner" style="display:none;background:var(--primary-light);border-radius:var(--radius-sm);padding:12px 16px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <strong style="color:var(--primary);">🔗 分享链接已开启</strong>
+            <div style="font-size:.85rem;color:var(--text-muted);margin-top:2px;">任何人都可以通过链接查看此相册</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <input type="text" id="share-link-input" class="form-input" style="width:300px;font-size:.8rem;" readonly>
+            <button class="btn btn-primary btn-sm" onclick="copyShareLink()">复制</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Slideshow button -->
+      <div id="slideshow-bar" style="display:none;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-outline btn-sm" onclick="startSlideshowFromAlbum()">
+          ▶ 自动播放幻灯片
+        </button>
+      </div>
+
+      <div id="photos-grid" class="photos-grid">
+        <!-- Photos rendered here -->
+      </div>
+
+      <div id="photos-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">📸</div>
+        <h3>相册还是空的</h3>
+        <p>上传你的第一张照片吧</p>
+        <button class="btn btn-primary" onclick="openUploadModal()">上传照片</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ===== SHARE PAGE ===== -->
+<div id="share-page" style="display:none;">
+  <nav class="navbar">
+    <div class="container navbar-inner">
+      <a class="navbar-brand" href="/">
+        <span>📷</span> 网络相册
+      </a>
+      <div class="navbar-actions">
+        <a href="/" class="btn btn-outline btn-sm">登录 / 注册</a>
+      </div>
+    </div>
+  </nav>
+  <div class="share-page">
+    <div class="container">
+      <div class="share-header">
+        <h1 id="share-album-title">相册</h1>
+        <p id="share-album-meta"></p>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+        <button class="btn btn-primary btn-sm" onclick="startSlideshowFromShare()">▶ 自动播放</button>
+      </div>
+      <div id="share-photos-grid" class="photos-grid"></div>
+      <div id="share-empty" class="empty-state" style="display:none;">
+        <div class="empty-icon">📷</div>
+        <h3>相册是空的</h3>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+
+<!-- Create Album Modal -->
+<div id="create-album-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">新建相册</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('create-album-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="create-album-alert" class="alert alert-error"></div>
+      <div class="form-group">
+        <label class="form-label">相册名称 *</label>
+        <input type="text" id="new-album-title" class="form-input" placeholder="给相册起个名字">
+      </div>
+      <div class="form-group">
+        <label class="form-label">描述（可选）</label>
+        <textarea id="new-album-desc" class="form-input" placeholder="描述一下这个相册..."></textarea>
+      </div>
+      <div class="form-group">
+        <div class="toggle-wrap">
+          <label class="toggle">
+            <input type="checkbox" id="new-album-public">
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="form-label" style="margin:0;">公开相册（生成分享链接）</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('create-album-modal')">取消</button>
+      <button class="btn btn-primary" onclick="handleCreateAlbum()" id="create-album-btn">创建</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Album Modal -->
+<div id="edit-album-modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">编辑相册</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('edit-album-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">相册名称</label>
+        <input type="text" id="edit-album-title" class="form-input">
+      </div>
+      <div class="form-group">
+        <label class="form-label">描述</label>
+        <textarea id="edit-album-desc" class="form-input"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('edit-album-modal')">取消</button>
+      <button class="btn btn-primary" onclick="handleEditAlbum()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Modal -->
+<div id="upload-modal" class="modal-overlay">
+  <div class="modal" style="max-width:560px;">
+    <div class="modal-header">
+      <h3 class="modal-title">上传照片</h3>
+      <button class="btn btn-ghost btn-icon" onclick="closeModal('upload-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()"
+           ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+        <div class="upload-icon">📁</div>
+        <p><strong>点击选择</strong>或拖拽图片到此处</p>
+        <p style="font-size:.8rem;margin-top:6px;color:#94a3b8;">支持 JPG、PNG、GIF、WebP 等格式，单文件最大 20MB</p>
+      </div>
+      <input type="file" id="file-input" multiple accept="image/*" onchange="handleFileSelect(event)">
+
+      <div id="selected-files" style="margin-top:12px;display:none;">
+        <p style="font-size:.85rem;color:var(--text-muted);margin-bottom:8px;" id="selected-count"></p>
+        <div id="file-list" style="max-height:150px;overflow-y:auto;"></div>
+      </div>
+
+      <div class="upload-progress" id="upload-progress">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+        </div>
+        <p class="progress-text" id="progress-text">上传中...</p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('upload-modal')">取消</button>
+      <button class="btn btn-primary" onclick="handleUpload()" id="upload-btn" disabled>上传</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== LIGHTBOX ===== -->
+<div id="lightbox" class="lightbox">
+  <div class="lightbox-header">
+    <span class="lightbox-title" id="lightbox-title"></span>
+    <div class="lightbox-controls">
+      <span style="color:rgba(255,255,255,.6);font-size:.85rem;" id="lightbox-counter"></span>
+      <button class="lightbox-btn" id="slideshow-btn" onclick="toggleSlideshow()" title="自动播放 (空格键)">
+        ▶ 幻灯片
+      </button>
+      <button class="lightbox-btn" onclick="closeLightbox()" title="关闭 (Esc)">✕ 关闭</button>
+    </div>
+  </div>
+  <div class="lightbox-body">
+    <button class="lightbox-nav lightbox-prev" onclick="lightboxPrev()">‹</button>
+    <img id="lightbox-img" class="lightbox-img" src="" alt="">
+    <button class="lightbox-nav lightbox-next" onclick="lightboxNext()">›</button>
+    <div class="slideshow-indicator" id="slideshow-indicator">▶ 自动播放中</div>
+  </div>
+  <div class="lightbox-footer" id="lightbox-footer"></div>
+</div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/ui.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
