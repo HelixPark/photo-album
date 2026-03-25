@@ -370,21 +370,21 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 .photo-item:hover .photo-overlay { opacity: 1; }
 .photo-delete-btn {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: 6px;
+  right: 6px;
   background: rgba(239,68,68,.9);
   color: #fff;
   border: none;
   border-radius: 50%;
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   opacity: 0;
   transition: opacity var(--transition);
-  font-size: .8rem;
+  font-size: .9rem;
 }
 .photo-item:hover .photo-delete-btn { opacity: 1; }
 
