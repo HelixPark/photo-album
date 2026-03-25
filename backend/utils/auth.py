@@ -1,4 +1,5 @@
 from __future__ import annotations
+import os
 from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
@@ -9,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from backend.database import get_db
 
-SECRET_KEY = "photo-album-secret-key-change-in-production-2024"
+SECRET_KEY = os.environ.get("SECRET_KEY", "photo-album-secret-key-change-in-production-2024")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 

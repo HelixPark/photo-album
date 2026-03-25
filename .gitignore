@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+*.egg-info/
+
+# 本地数据（不上传到 Git）
+photo_album.db
+uploads/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.webp
+
+# 测试文件
+test_photo_*.jpg
+create_test_images.py
+
+# 环境变量
+.env
+.env.local
+
+# IDE
+.DS_Store
+.idea/
+.vscode/
+
+# gstack 报告（可选保留）
+# .gstack/
