@@ -91,6 +91,7 @@ body {
   white-space: nowrap;
 }
 .btn:disabled { opacity: .6; cursor: not-allowed; }
+.btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btn-primary { background: var(--primary); color: #fff; }
 .btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
 .btn-outline {
@@ -213,7 +214,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   justify-content: space-between;
   margin-bottom: 28px;
 }
-.page-title { font-size: 1.5rem; font-weight: 700; }
+.page-title { font-size: 1.5rem; font-weight: 700; text-wrap: balance; }
 .page-subtitle { color: var(--text-muted); font-size: .9rem; margin-top: 2px; }
 
 /* ===== Album Grid ===== */
