@@ -156,6 +156,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   padding: 40px;
   width: 100%;
   max-width: 420px;
+  border-top: 4px solid var(--primary);
 }
 .auth-logo {
   text-align: center;
