@@ -148,6 +148,8 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   align-items: center;
   justify-content: center;
   background: var(--bg);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 24px 24px;
   padding: 20px;
 }
 .auth-card {
@@ -231,7 +233,7 @@ textarea.form-input { resize: vertical; min-height: 80px; }
   cursor: pointer;
   transition: transform var(--transition), box-shadow var(--transition);
 }
-.album-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
+.album-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .album-cover {
   width: 100%;
   aspect-ratio: 4/3;
@@ -268,12 +270,17 @@ textarea.form-input { resize: vertical; min-height: 80px; }
 /* ===== Empty State ===== */
 .empty-state {
   text-align: center;
-  padding: 60px 20px;
+  padding: 80px 20px;
   color: var(--text-muted);
 }
-.empty-state .empty-icon { font-size: 4rem; margin-bottom: 16px; }
-.empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; }
-.empty-state p { font-size: .9rem; margin-bottom: 20px; }
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+  opacity: .5;
+  display: block;
+}
+.empty-state h3 { font-size: 1.1rem; font-weight: 600; color: var(--text); margin-bottom: 8px; text-wrap: balance; }
+.empty-state p { font-size: .9rem; margin-bottom: 24px; max-width: 280px; margin-left: auto; margin-right: auto; }
 
 /* ===== Modal ===== */
 .modal-overlay {
